@@ -1,4 +1,4 @@
-import 'package:actual/component/custom_text_form_field.dart';
+import 'package:actual/user/login_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,23 +15,7 @@ class _App extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'NotoSans',
       ),
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomTextFormField(
-              hintText: '이메일을 입력해주세요.',
-              onChange: (String value) {},
-            ),
-            CustomTextFormField(
-              hintText: '비밀번호를 입력해주세요.',
-              onChange: (String value) {},
-              obscureText: true,
-            ),
-          ],
-        ),
-      ),
+      home: const LoginScreen(),
     );
   }
 }
