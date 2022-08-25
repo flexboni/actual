@@ -3,21 +3,27 @@ import 'dart:io';
 
 import 'package:actual/common/const/colors.dart';
 import 'package:actual/common/layout/default_layout.dart';
+import 'package:actual/common/view/root_tab.dart';
 import 'package:actual/component/custom_text_form_field.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emulatorIp = '10.0.2.2:3000';
+  final simulatorIp = '127.0.0.1:3000';
+
+  String username = '', password = '';
 
   @override
   Widget build(BuildContext context) {
     final dio = Dio();
-
-    const emulatorIp = '10.0.2.2:3000';
-    const simulatorIp = '127.0.0.1:3000';
 
     final ip = Platform.isIOS ? simulatorIp : emulatorIp;
 
@@ -41,19 +47,23 @@ class LoginScreen extends StatelessWidget {
                 ),
                 CustomTextFormField(
                   hintText: '이메일을 입력해주세요.',
-                  onChange: (String value) {},
+                  onChange: (String value) {
+                    username = value;
+                  },
                 ),
                 const SizedBox(height: 16.0),
                 CustomTextFormField(
                   hintText: '비밀번호를 입력해주세요.',
-                  onChange: (String value) {},
+                  onChange: (String value) {
+                    password = value;
+                  },
                   obscureText: true,
                 ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () async {
                     // ID:비밀번호
-                    const rawString = 'test@codefacotry.ai:testtest';
+                    final rawString = '$username:$password';
 
                     Codec<String, String> stringToBase64 = utf8.fuse(base64);
 
@@ -67,6 +77,10 @@ class LoginScreen extends StatelessWidget {
                         },
                       ),
                     );
+
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const RootTab(),
+                    ));
 
                     print(resp.data);
                   },
