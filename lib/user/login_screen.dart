@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:actual/common/const/colors.dart';
 import 'package:actual/common/layout/default_layout.dart';
 import 'package:actual/component/custom_text_form_field.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -10,6 +14,13 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dio = Dio();
+
+    const emulatorIp = '10.0.2.2:3000';
+    const simulatorIp = '127.0.0.1:3000';
+
+    final ip = Platform.isIOS ? simulatorIp : emulatorIp;
+
     return DefaultLayout(
       child: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -40,14 +51,46 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    // ID:비밀번호
+                    const rawString = 'test@codefacotry.ai:testtest';
+
+                    Codec<String, String> stringToBase64 = utf8.fuse(base64);
+
+                    String token = stringToBase64.encode(rawString);
+
+                    final resp = await dio.post(
+                      'http://$ip/auth/login',
+                      options: Options(
+                        headers: {
+                          'authorization': 'Basic $token',
+                        },
+                      ),
+                    );
+
+                    print(resp.data);
+                  },
                   style: ElevatedButton.styleFrom(
                     primary: PRIMARY_COLOR,
                   ),
                   child: const Text('로그인'),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    const refreshToken =
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RAY29kZWZhY3RvcnkuYWkiLCJzdWIiOiJmNTViMzJkMi00ZDY4LTRjMWUtYTNjYS1kYTlkN2QwZDkyZTUiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTY2MTM4NTkwMSwiZXhwIjoxNjYxNDcyMzAxfQ.TBBdo5Z1RnDeEq4Kbro0mb9lHBktkcTEFRlhnH_3hdw';
+
+                    final resp = await dio.post(
+                      'http://$ip/auth/token',
+                      options: Options(
+                        headers: {
+                          'authorization': 'Bearer $refreshToken',
+                        },
+                      ),
+                    );
+
+                    print(resp.data);
+                  },
                   style: TextButton.styleFrom(
                     primary: Colors.black,
                   ),
