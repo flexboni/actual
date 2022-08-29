@@ -25,16 +25,24 @@ class _SplashScreenState extends State<SplashScreen> {
     final refreshToken = await storage.read(key: REFRESH_TOKEN_KEY);
     final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
 
+    print('refreshToken: $refreshToken');
+    print('accessToken: $accessToken');
+
     final dio = Dio();
 
     try {
-      await dio.post(
+      final resp = await dio.post(
         'http://$ip/auth/token',
         options: Options(
           headers: {
             'authorization': 'Bearer $refreshToken',
           },
         ),
+      );
+
+      await storage.write(
+        key: ACCESS_TOKEN_KEY,
+        value: resp.data['accessToken'],
       );
 
       if (!mounted) return;

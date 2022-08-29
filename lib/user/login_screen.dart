@@ -62,6 +62,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     String token = stringToBase64.encode(rawString);
 
+                    print('token: $token');
+
                     final dio = Dio();
 
                     final resp = await dio.post(
