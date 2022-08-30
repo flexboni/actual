@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:actual/common/const/data.dart';
+import 'package:actual/common/utils/data_utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'restaurant_model.g.dart';
@@ -15,7 +16,7 @@ enum RestaurantPriceRange {
 class RestaurantModel {
   final String id;
   final String name;
-  @JsonKey(fromJson: pathToUrl)
+  @JsonKey(fromJson: DataUtils.pathToUrl)
   final String thumbUrl;
   final List<String> tags;
   final RestaurantPriceRange priceRange;
@@ -38,6 +39,4 @@ class RestaurantModel {
 
   factory RestaurantModel.fromJson(Map<String, dynamic> json) =>
       _$RestaurantModelFromJson(json);
-
-  static pathToUrl(String value) => 'http://$ip$value';
 }
