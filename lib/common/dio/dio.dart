@@ -15,6 +15,7 @@ class CustomInterceptor extends Interceptor {
   @override
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
+    print('[REQ] [${options.method}] ${options.uri}');
     if (options.headers['accessToken'] == 'true') {
       // 불필요한 헤더 삭제
       options.headers.remove('accessToken');
@@ -41,13 +42,15 @@ class CustomInterceptor extends Interceptor {
 // 2) 응답 받을때
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    // TODO: implement onResponse
+    print(
+        '[RES] [${response.requestOptions.method}] ${response.requestOptions.uri}');
     super.onResponse(response, handler);
   }
 
 // 3) 에러 발생 했을때
   @override
   Future<void> onError(DioError err, ErrorInterceptorHandler handler) async {
+    print('[ERR] [${err.requestOptions.method}] ${err.requestOptions.uri}');
     // 401 에러가 났을 때 (status code)
     // 토큰을 재발급 받는 시도를 하고 토큰이 재발급 되면
     // 다시 새로운 토큰으로 요청을 한다.
@@ -55,41 +58,41 @@ class CustomInterceptor extends Interceptor {
 
     // refreshToken 아예 없으면 당연히 에러를 던진다
     if (refreshToken == null) {
-      handler.reject(err);
-    } else {
-      final isStatus401 = err.response?.statusCode == 401;
-      final isPathRefresh = err.requestOptions.path == '/auth/token';
+      return handler.reject(err);
+    }
 
-      if (isStatus401 && !isPathRefresh) {
-        final dio = Dio();
+    final isStatus401 = err.response?.statusCode == 401;
+    final isPathRefresh = err.requestOptions.path == '/auth/token';
 
-        try {
-          final resp = await dio.post(
-            'http://$ip/auth/token',
-            options: Options(
-              headers: {'authorization': 'Bearer $refreshToken'},
-            ),
-          );
+    if (isStatus401 && !isPathRefresh) {
+      final dio = Dio();
 
-          final accessToken = resp.data['accessToken'];
+      try {
+        final resp = await dio.post(
+          'http://$ip/auth/token',
+          options: Options(
+            headers: {'authorization': 'Bearer $refreshToken'},
+          ),
+        );
 
-          final options = err.requestOptions;
-          options.headers.addAll({
-            'authorization': 'Bearer $accessToken',
-          });
+        final accessToken = resp.data['accessToken'];
 
-          await storage.write(key: ACCESS_TOKEN_KEY, value: accessToken);
+        final options = err.requestOptions;
+        options.headers.addAll({
+          'authorization': 'Bearer $accessToken',
+        });
 
-          // 요청 재전송
-          final response = await dio.fetch(options);
+        await storage.write(key: ACCESS_TOKEN_KEY, value: accessToken);
 
-          handler.resolve(response);
-        } on DioError catch (e) {
-          handler.reject(e);
-        }
+        // 요청 재전송
+        final response = await dio.fetch(options);
+
+        return handler.resolve(response);
+      } on DioError catch (e) {
+        return handler.reject(e);
       }
     }
 
-    super.onError(err, handler);
+    return handler.reject(err);
   }
 }
