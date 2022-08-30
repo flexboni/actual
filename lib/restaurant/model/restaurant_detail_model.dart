@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:actual/common/const/data.dart';
 import 'package:actual/restaurant/model/restaurant_model.dart';
 
 class RestaurantDetailModel extends RestaurantModel {
@@ -34,13 +35,7 @@ class RestaurantDetailModel extends RestaurantModel {
         detail: json['detail'],
         products: json['products']
             .map<RestaurantProductModel>(
-              (product) => RestaurantProductModel(
-                id: product['id'],
-                name: product['name'],
-                imgUrl: product['imgUrl'],
-                detail: product['detail'],
-                price: product['price'],
-              ),
+              (product) => RestaurantProductModel.fromJson(product),
             )
             .toList(),
       );
@@ -60,4 +55,13 @@ class RestaurantProductModel {
     required this.detail,
     required this.price,
   });
+
+  factory RestaurantProductModel.fromJson(Map<String, dynamic> json) =>
+      RestaurantProductModel(
+        id: json['id'],
+        name: json['name'],
+        imgUrl: 'http://$ip${json['imgUrl']}',
+        detail: json['detail'],
+        price: json['price'],
+      );
 }

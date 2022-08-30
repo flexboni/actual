@@ -1,8 +1,33 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:actual/common/const/colors.dart';
+import 'package:actual/restaurant/model/restaurant_detail_model.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({Key? key}) : super(key: key);
+  final Image image;
+  final String name;
+  final String detail;
+  final int price;
+
+  const ProductCard({
+    Key? key,
+    required this.image,
+    required this.name,
+    required this.detail,
+    required this.price,
+  }) : super(key: key);
+
+  factory ProductCard.fromModel(RestaurantProductModel model) => ProductCard(
+        image: Image.network(
+          model.imgUrl,
+          width: 110,
+          height: 110,
+          fit: BoxFit.cover,
+        ),
+        name: model.name,
+        detail: model.detail,
+        price: model.price,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -13,37 +38,32 @@ class ProductCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: Image.asset(
-              'asset/img/food/ddeok_bok_gi.jpg',
-              width: 110,
-              height: 110,
-              fit: BoxFit.cover,
-            ),
+            child: image,
           ),
           const SizedBox(width: 16.0),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
+              children: [
                 Text(
-                  '떡볶이',
-                  style: TextStyle(
+                  name,
+                  style: const TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
-                  'alksjdf;lkajsdkfljasdkfjas;dkjflkasjdflkajsdflkjasdlkjasdlkfjasldkfjalksdjflaksdjflaksdjflaskdjflkasfj',
+                  detail,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14.0,
                     color: BODY_TEXT_COLOR,
                   ),
                 ),
                 Text(
-                  '\$${1000}',
+                  '₩${price}',
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 12.0,

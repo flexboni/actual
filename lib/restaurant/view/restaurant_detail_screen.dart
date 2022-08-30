@@ -49,7 +49,7 @@ class RestaurantDetailScreen extends StatelessWidget {
             slivers: [
               renderTop(item),
               renderLabel(),
-              renderProducts(),
+              renderProducts(item.products),
             ],
           );
         },
@@ -81,17 +81,22 @@ class RestaurantDetailScreen extends StatelessWidget {
     );
   }
 
-  SliverPadding renderProducts() {
+  SliverPadding renderProducts(
+    List<RestaurantProductModel> products,
+  ) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            return const Padding(
-              padding: EdgeInsets.only(top: 16.0),
-              child: ProductCard(),
+            final model = products[index];
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: ProductCard.fromModel(model),
             );
           },
+          childCount: products.length,
         ),
       ),
     );
