@@ -10,14 +10,16 @@ import 'package:flutter/material.dart';
 class RestaurantScreen extends StatelessWidget {
   const RestaurantScreen({Key? key}) : super(key: key);
 
-  Future<List> paginateRestaurant() async {
+  Future<List<RestaurantModel>> paginateRestaurant() async {
     final dio = Dio();
 
     dio.interceptors.add(CustomInterceptor(storage));
 
-    final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+    final resp =
+        await RestaurantRepository(dio, baseUrl: 'http://$ip/restaurant')
+            .paginate();
 
-    return RestaurantRepository(dio).paginate();
+    return resp.data;
   }
 
   @override
@@ -25,9 +27,10 @@ class RestaurantScreen extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: FutureBuilder(
+        child: FutureBuilder<List<RestaurantModel>>(
           future: paginateRestaurant(),
-          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+          builder: (BuildContext context,
+              AsyncSnapshot<List<RestaurantModel>> snapshot) {
             if (!snapshot.hasData) {
               return const Center(
                 child: CircularProgressIndicator(),
@@ -38,20 +41,18 @@ class RestaurantScreen extends StatelessWidget {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (_, index) {
                   final item = snapshot.data![index];
-                  // parsed
-                  final pItem = RestaurantModel.fromJson(item);
 
                   return GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => RestaurantDetailScreen(
-                            id: pItem.id,
+                            id: item.id,
                           ),
                         ),
                       );
                     },
-                    child: RestaurantCard.fromModel(pItem),
+                    child: RestaurantCard.fromModel(item),
                   );
                 },
                 separatorBuilder: (_, index) {
