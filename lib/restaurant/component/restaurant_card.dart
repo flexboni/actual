@@ -36,7 +36,11 @@ class RestaurantCard extends StatelessWidget {
     this.detail,
   }) : super(key: key);
 
-  factory RestaurantCard.fromModel(model, {bool isDetail = false}) {
+  factory RestaurantCard.fromModel(
+    model, {
+    bool isDetail = false,
+    String? detail,
+  }) {
     return RestaurantCard(
       image: Image.network(
         'http://$ip${model.thumbUrl}',
@@ -49,7 +53,7 @@ class RestaurantCard extends StatelessWidget {
       deliveryFee: model.deliveryFee,
       ratings: model.ratings,
       isDetail: isDetail,
-      detail: model.detail,
+      detail: detail,
     );
   }
 
