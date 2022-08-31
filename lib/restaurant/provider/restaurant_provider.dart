@@ -22,7 +22,7 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
     // 추가로 데이터 더 가져오기
     // true - 추가로 데이터 더 가져옴
     // false - 새로고침 (현재 상태를 덮어씌움)
-    bool fetchMode = false,
+    bool fetchMore = false,
     // 강제로 다시 로딩하기
     // true - CursorPaginationLoading()
     bool forceRefetch = false,
@@ -42,10 +42,17 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
     //    fetchMore 가 아닐 때 - 새로고침의 의도가 있음
     if (state is CursorPagination && !forceRefetch) {
       final pState = state as CursorPagination;
-
       if (!pState.meta.hasMore) {
         return;
       }
+    }
+
+    final isLoading = state is CursorPaginationLoading;
+    final isRefetching = state is CursorPaginationRefetching;
+    final isFetchingMore = state is CursorPaginationFetchingMore;
+    // 2번 반환 상황
+    if (fetchMore && (isLoading || isRefetching || isFetchingMore)) {
+      return;
     }
 
     final resp = await repository.paginate();
