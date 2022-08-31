@@ -3,20 +3,22 @@ import 'dart:convert';
 import 'package:actual/common/const/colors.dart';
 import 'package:actual/common/const/data.dart';
 import 'package:actual/common/layout/default_layout.dart';
+import 'package:actual/common/secure_storage/secure_storage.dart';
 import 'package:actual/common/view/root_tab.dart';
 import 'package:actual/component/custom_text_form_field.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  String username = '', password = '';
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  String username = 'test@codefactory.ai', password = 'testtest';
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: MediaQuery.of(context).size.width / 3 * 2,
                 ),
                 CustomTextFormField(
+                  initialValue: username,
                   hintText: '이메일을 입력해주세요.',
                   onChange: (String value) {
                     username = value;
@@ -46,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 CustomTextFormField(
+                  initialValue: password,
                   hintText: '비밀번호를 입력해주세요.',
                   onChange: (String value) {
                     password = value;
@@ -55,14 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () async {
+                    final storage = ref.read(secureStorageProvider);
                     // ID:비밀번호
                     final rawString = '$username:$password';
 
                     Codec<String, String> stringToBase64 = utf8.fuse(base64);
-
                     String token = stringToBase64.encode(rawString);
-
-                    print('token: $token');
 
                     final dio = Dio();
 
