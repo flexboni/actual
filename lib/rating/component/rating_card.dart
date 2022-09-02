@@ -49,7 +49,8 @@ class RatingCard extends StatelessWidget {
         ),
         _Body(content: content),
         if (images.isNotEmpty)
-          SizedBox(
+          Container(
+            padding: const EdgeInsets.only(top: 8.0),
             height: 100,
             child: _Images(images: images),
           ),
