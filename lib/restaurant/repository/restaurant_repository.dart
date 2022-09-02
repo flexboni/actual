@@ -17,7 +17,8 @@ final restaurantRepositoryProvider = Provider<RestaurantRepository>((ref) {
 });
 
 @RestApi()
-abstract class RestaurantRepository implements IBasePaginationRepository {
+abstract class RestaurantRepository
+    implements IBasePaginationRepository<RestaurantModel> {
   // https://$ip/restaurant/
   factory RestaurantRepository(Dio dio, {String baseUrl}) =
       _RestaurantRepository;

@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:actual/common/model/cursor_pagination_model.dart';
+import 'package:actual/common/provider/pagination_provider.dart';
 import 'package:actual/restaurant/model/restaurant_model.dart';
 import 'package:actual/restaurant/repository/restaurant_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,17 +18,16 @@ final restaurantDetailProvider =
 
 final restaurantProvider =
     StateNotifierProvider<RestaurantStateNotifier, CursorPaginationBase>((ref) {
-  return RestaurantStateNotifier(ref.watch(restaurantRepositoryProvider));
+  return RestaurantStateNotifier(
+    repository: ref.watch(restaurantRepositoryProvider),
+  );
 });
 
-class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
-  final RestaurantRepository repository;
-
-  RestaurantStateNotifier(
-    this.repository,
-  ) : super(CursorPaginationLoading()) {
-    paginate();
-  }
+class RestaurantStateNotifier
+    extends PaginationProvider<RestaurantModel, RestaurantRepository> {
+  RestaurantStateNotifier({
+    required super.repository,
+  });
 
   void getDetail({required String id}) async {
     // 만약에 아직 데이터가 하나도 없는 상태라면 (CursorPagination 이 아니라면)
