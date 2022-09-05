@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:actual/common/const/data.dart';
 import 'package:actual/common/secure_storage/secure_storage.dart';
+import 'package:actual/user/provider/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -8,15 +9,24 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 final dioProvider = Provider<Dio>((ref) {
   final dio = Dio();
 
-  dio.interceptors.add(CustomInterceptor(ref.watch(secureStorageProvider)));
+  dio.interceptors.add(
+    CustomInterceptor(
+      storage: ref.watch(secureStorageProvider),
+      ref: ref,
+    ),
+  );
 
   return dio;
 });
 
 class CustomInterceptor extends Interceptor {
   final FlutterSecureStorage storage;
+  final Ref ref;
 
-  CustomInterceptor(this.storage);
+  CustomInterceptor({
+    required this.storage,
+    required this.ref,
+  });
 
   // 1) 요청 보낼때
   // 만약 요청의 Header에 accessToken: true 라는 값이 있다면
@@ -99,6 +109,19 @@ class CustomInterceptor extends Interceptor {
 
         return handler.resolve(response);
       } on DioError catch (e) {
+        // Circular dependency error
+        // A, B
+        // A -> B 의 친구
+        // B -> A 의 친구
+        // A는 B의 친구구나
+        // A -> B -> A -> B -> ...
+        // UMP -> Dio -> UMP -> Dio -> ...
+        // ref.read(userMeProvider.notifier).logout();
+
+        // 해결방법
+        // 상위에 하나로 묶을 수 있는 것으로 우회
+        ref.read(authProvider.notifier).logout();
+
         return handler.reject(e);
       }
     }
