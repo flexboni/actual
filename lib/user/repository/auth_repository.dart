@@ -1,8 +1,17 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:actual/common/const/data.dart';
+import 'package:actual/common/dio/dio.dart';
 import 'package:actual/common/model/login_response.dart';
 import 'package:actual/common/model/token_response.dart';
 import 'package:actual/common/utils/data_utils.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => AuthRepository(
+    dio: ref.watch(dioProvider),
+    baseUrl: 'http://$ip/auth',
+  ),
+);
 
 class AuthRepository {
   final Dio dio;

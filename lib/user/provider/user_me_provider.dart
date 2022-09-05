@@ -1,17 +1,27 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:actual/common/const/data.dart';
+import 'package:actual/common/secure_storage/secure_storage.dart';
 import 'package:actual/user/model/user_model.dart';
-import 'package:actual/user/provider/auth_repository.dart';
+import 'package:actual/user/repository/auth_repository.dart';
 import 'package:actual/user/repository/user_me_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class UserMeNotifier extends StateNotifier<UserModelBase?> {
+final userMeProvider =
+    StateNotifierProvider<UserMeStateNotifier, UserModelBase?>(
+  (ref) => UserMeStateNotifier(
+    authRepository: ref.watch(authRepositoryProvider),
+    repository: ref.watch(userMeRepositoryProvider),
+    storage: ref.watch(secureStorageProvider),
+  ),
+);
+
+class UserMeStateNotifier extends StateNotifier<UserModelBase?> {
   final AuthRepository authRepository;
   final UserMeRepository repository;
   final FlutterSecureStorage storage;
 
-  UserMeNotifier({
+  UserMeStateNotifier({
     required this.authRepository,
     required this.repository,
     required this.storage,
