@@ -5,6 +5,7 @@ import 'package:actual/product/provider/product_provider.dart';
 import 'package:actual/restaurant/view/restaurant_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductScreen extends ConsumerStatefulWidget {
   const ProductScreen({Key? key}) : super(key: key);
@@ -19,13 +20,12 @@ class _ProductTabState extends ConsumerState<ProductScreen> {
     return PaginationListView<ProductModel>(
       provider: productProvider,
       itemBuilder: <ProductModel>(_, index, model) => GestureDetector(
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => RestaurantDetailScreen(
-              title: model.name,
-              id: model.restaurant.id,
-            ),
-          ),
+        onTap: () => context.goNamed(
+          RestaurantDetailScreen.routeName,
+          params: {
+            'title': model.restaurant.name,
+            'rid': model.restaurant.id,
+          },
         ),
         child: ProductCard.fromProductModel(model),
       ),
