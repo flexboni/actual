@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 class RootTab extends StatefulWidget {
   const RootTab({Key? key}) : super(key: key);
 
+  static String get routeName => 'home';
+
   @override
   State<RootTab> createState() => _RootTabState();
 }
