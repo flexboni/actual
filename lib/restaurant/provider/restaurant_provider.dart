@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: depend_on_referenced_packages
 import 'package:actual/common/model/cursor_pagination_model.dart';
 import 'package:actual/common/provider/pagination_provider.dart';
 import 'package:actual/restaurant/model/restaurant_model.dart';
