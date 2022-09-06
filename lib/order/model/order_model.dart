@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:actual/common/model/model_with_id.dart';
 import 'package:actual/common/utils/data_utils.dart';
 import 'package:actual/restaurant/model/restaurant_model.dart';
@@ -22,6 +21,9 @@ class OrderProductModel {
     required this.imgUrl,
     required this.price,
   });
+
+  factory OrderProductModel.fromJson(Map<String, dynamic> json) =>
+      _$OrderProductModelFromJson(json);
 }
 
 @JsonSerializable()
