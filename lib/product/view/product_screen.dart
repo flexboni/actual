@@ -27,7 +27,7 @@ class _ProductTabState extends ConsumerState<ProductScreen> {
             'rid': model.restaurant.id,
           },
         ),
-        child: ProductCard.fromProductModel(model),
+        child: ProductCard.fromProductModel(model: model),
       ),
     );
   }
