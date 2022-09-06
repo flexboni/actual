@@ -1,8 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:actual/common/const/colors.dart';
 import 'package:actual/common/layout/default_layout.dart';
 import 'package:actual/common/model/cursor_pagination_model.dart';
 import 'package:actual/common/utils/pagination_utils.dart';
 import 'package:actual/product/component/product_card.dart';
+import 'package:actual/product/model/product_model.dart';
 import 'package:actual/rating/component/rating_card.dart';
 import 'package:actual/rating/model/rating_model.dart';
 import 'package:actual/restaurant/component/restaurant_card.dart';
@@ -10,6 +12,8 @@ import 'package:actual/restaurant/model/restaurant_detail_model.dart';
 import 'package:actual/restaurant/model/restaurant_model.dart';
 import 'package:actual/restaurant/provider/restaurant_provider.dart';
 import 'package:actual/restaurant/provider/restaurant_rating_provider.dart';
+import 'package:actual/user/provider/basket_provider.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skeletons/skeletons.dart';
@@ -55,6 +59,7 @@ class _RestaurantDetailScreenState
   Widget build(BuildContext context) {
     final state = ref.watch(restaurantDetailProvider(widget.id));
     final ratingsState = ref.watch(restaurantRatingProvider(widget.id));
+    final basket = ref.watch(basketProvider);
 
     if (state == null) {
       return const Center(
@@ -64,13 +69,33 @@ class _RestaurantDetailScreenState
 
     return DefaultLayout(
       title: widget.title,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: PRIMARY_COLOR,
+        child: Badge(
+          showBadge: basket.isNotEmpty,
+          badgeContent: Text(
+            basket
+                .fold<int>(
+                  0,
+                  (previousValue, element) => previousValue + element.count,
+                )
+                .toString(),
+            style: const TextStyle(color: PRIMARY_COLOR),
+          ),
+          badgeColor: Colors.white,
+          child: const Icon(
+            Icons.shopping_basket_outlined,
+          ),
+        ),
+      ),
       child: CustomScrollView(
         controller: _controller,
         slivers: [
           renderTop(state),
           if (state is! RestaurantDetailModel) renderLoading(),
           if (state is RestaurantDetailModel) renderLabel(),
-          if (state is RestaurantDetailModel) renderProducts(state.products),
+          if (state is RestaurantDetailModel) renderProducts(state),
           if (ratingsState is CursorPagination<RatingModel>)
             renderRatings(models: ratingsState.data)
         ],
@@ -127,22 +152,32 @@ class _RestaurantDetailScreenState
     );
   }
 
-  SliverPadding renderProducts(
-    List<RestaurantProductModel> products,
-  ) {
+  SliverPadding renderProducts(RestaurantDetailModel restaurant) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            final model = products[index];
-
-            return Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: ProductCard.fromRestaurantModel(model),
+            final model = restaurant.products[index];
+            // onTap 을 했을 때 눌림 효과가 나타난다.
+            return InkWell(
+              onTap: () => ref.read(basketProvider.notifier).addToBasket(
+                    product: ProductModel(
+                      id: model.id,
+                      name: model.name,
+                      detail: model.detail,
+                      imgUrl: model.imgUrl,
+                      price: model.price,
+                      restaurant: restaurant,
+                    ),
+                  ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: ProductCard.fromRestaurantModel(model),
+              ),
             );
           },
-          childCount: products.length,
+          childCount: restaurant.products.length,
         ),
       ),
     );

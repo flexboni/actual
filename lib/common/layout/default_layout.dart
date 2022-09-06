@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 class DefaultLayout extends StatelessWidget {
@@ -5,13 +6,15 @@ class DefaultLayout extends StatelessWidget {
   final Color? backgroundColor;
   final String? title;
   final Widget? bottomNavigationBar;
+  final Widget? floatingActionButton;
 
   const DefaultLayout({
+    Key? key,
     required this.child,
     this.backgroundColor,
     this.title,
     this.bottomNavigationBar,
-    Key? key,
+    this.floatingActionButton,
   }) : super(key: key);
 
   @override
@@ -21,6 +24,7 @@ class DefaultLayout extends StatelessWidget {
       appBar: renderAppBar(),
       body: child,
       bottomNavigationBar: bottomNavigationBar,
+      floatingActionButton: floatingActionButton,
     );
   }
 
