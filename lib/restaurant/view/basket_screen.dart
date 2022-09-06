@@ -1,17 +1,25 @@
 import 'package:actual/common/const/colors.dart';
 import 'package:actual/common/layout/default_layout.dart';
+import 'package:actual/order/provider/order_provider.dart';
+import 'package:actual/order/view/order_done_screen.dart';
 import 'package:actual/product/component/product_card.dart';
 import 'package:actual/user/provider/basket_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class BasketScreen extends ConsumerWidget {
+class BasketScreen extends ConsumerStatefulWidget {
   const BasketScreen({Key? key}) : super(key: key);
 
   static String get routeName => 'basket';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BasketScreen> createState() => _BasketScreenState();
+}
+
+class _BasketScreenState extends ConsumerState<BasketScreen> {
+  @override
+  Widget build(BuildContext context) {
     final basket = ref.watch(basketProvider);
 
     if (basket.isEmpty) {
@@ -101,9 +109,24 @@ class BasketScreen extends ConsumerWidget {
                   SizedBox(
                     width: double.maxFinite,
                     child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('결제하기'),
+                      onPressed: () async {
+                        final resp =
+                            await ref.read(orderProvider.notifier).postOrder();
+
+                        if (!mounted) return;
+
+                        if (resp) {
+                          context.goNamed(OrderDoneScreen.routeName);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('결제 실패!'),
+                            ),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(primary: PRIMARY_COLOR),
+                      child: const Text('결제하기'),
                     ),
                   )
                 ],

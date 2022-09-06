@@ -29,6 +29,22 @@ class OrderStateNotifier extends StateNotifier<List<OrderModel>> {
 
       final state = ref.read(basketProvider);
 
+      final body = PostOrderBody(
+        id: id,
+        products: state
+            .map((e) => PostOrderBodyProduct(
+                  productId: e.product.id,
+                  count: e.count,
+                ))
+            .toList(),
+        totalPrice: state.fold<int>(
+          0,
+          (previousValue, element) =>
+              previousValue + (element.count * element.product.price),
+        ),
+        createdAt: DateTime.now().toString(),
+      );
+
       final resp = await repository.postOrder(
         body: PostOrderBody(
           id: id,
